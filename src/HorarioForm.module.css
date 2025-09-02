@@ -1,0 +1,313 @@
+/* --- Fuentes y Layout Global --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.appContainer {
+  /* --- CAMBIOS PRINCIPALES AQUÍ --- */
+  display: grid;
+  grid-template-columns: 2.5fr 2fr 1fr; /* Formulario | Lista | Botón */
+  /* --- Fin de los cambios --- */
+
+  gap: 30px; /* Reducimos un poco el espacio */
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  background-color: #F8F9FA;
+  min-height: 100vh;
+  max-width: 1800px; /* Aumentamos el ancho máximo para 3 columnas */
+  margin: 0 auto;
+}
+
+
+.listColumn h2 {
+  font-size: 1.75rem;
+  color: #1F2937;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+/* --- NUEVO: Estilos para la tercera columna --- */
+.actionColumn .btnGenerar {
+    position: sticky;
+    top: 2rem; /* Para que se alinee con el formulario */
+}
+
+/* --- Formulario Principal --- */
+.form {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+  position: sticky;
+  top: 2rem;
+}
+
+.form h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #111827;
+}
+
+.hr {
+  margin: 25px 0;
+  border: none;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* --- Componentes del Formulario --- */
+.componenteContainer {
+  background-color: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.componenteContainer h4 {
+  margin: 0 0 15px 0;
+  color: #374151;
+}
+
+/* --- Grupos y Sesiones --- */
+.grupoContainer {
+  border-top: 1px dashed #D1D5DB;
+  margin-top: 15px;
+  padding-top: 15px;
+}
+
+.grupoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.grupoHeader h5 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1F2937;
+  font-weight: 600;
+}
+
+.sesionContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+/* --- Inputs --- */
+.input, .inputLargo {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.inputLargo {
+    font-weight: 500;
+}
+
+.input:focus, .inputLargo:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.inputGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* --- Botones --- */
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btnPrimary {
+  background-color: #6366F1;
+  color: white;
+}
+
+.btnPrimary:disabled {
+    background-color: #A5B4FC;
+    cursor: not-allowed;
+}
+
+.btnPrimary:not(:disabled):hover {
+  background-color: #4F46E5;
+}
+
+.btnSecondary {
+  background: #F3F4F6;
+  color: #374151;
+  border: 1px solid #E5E7EB;
+}
+
+.btnSecondary:hover {
+  background: #E5E7EB;
+}
+
+.btnQuitar {
+  background: #FEF2F2;
+  color: #EF4444;
+  font-size: 0.8rem;
+  padding: 6px 10px;
+}
+
+.btnQuitar:hover {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+
+.btnQuitarMini {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+.btnQuitarMini:hover {
+    color: #EF4444;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btnGenerar {
+  width: 100%;
+  padding: 12px 25px;
+  font-size: 1.1em;
+  background-color: #10B981;
+}
+
+.btnGenerar:hover {
+    background-color: #059669;
+}
+
+/* --- Tarjeta de Curso Guardado --- */
+.cursoCard {
+  background: white;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.cursoCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+.cursoCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #F3F4F6;
+  padding-bottom: 10px;
+}
+
+.cursoCardHeader h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1F2937;
+  font-weight: 600;
+}
+
+.cursoCardActions {
+  display: flex;
+  gap: 8px;
+}
+
+.cursoCardActions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.1rem;
+  color: #9CA3AF;
+  transition: color 0.2s ease;
+}
+
+.cursoCardActions button:hover {
+  color: #4B5563;
+}
+
+.grupoDetalle {
+  margin-top: 15px;
+  padding-left: 10px;
+}
+
+.grupoDetalle p {
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.grupoDetalle b {
+    color: #111827;
+}
+
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.tagTeoria { background-color: #E0E7FF; color: #4338CA; }
+.tagPractica { background-color: #D1FAE5; color: #065F46; }
+.tagLaboratorio { background-color: #FEF3C7; color: #92400E; }
+
+.sesionesList {
+    list-style: none;
+    padding-left: 20px;
+    margin: 0;
+    font-size: 0.9rem;
+    color: #4B5563;
+}
+
+.sesionesList li {
+    margin-bottom: 5px;
+}
+
+.skeleton {
+  opacity: 0.7;
+  animation: skeleton-loading 1s linear infinite alternate;
+}
+
+@keyframes skeleton-loading {
+  0% { background-color: #E5E7EB; }
+  100% { background-color: #F3F4F6; }
+}
+
+.skeletonCard {
+    height: 150px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}

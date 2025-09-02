@@ -1,0 +1,209 @@
+/* --- Contenedor Principal y Panel de Control --- */
+.pageContainer {
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  background-color: #F8F9FA;
+  color: #111827;
+}
+
+.controlPanel {
+  background: white;
+  padding: 20px 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+/* --- Parrilla de Horario --- */
+.scheduleContainer {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #E5E7EB;
+  overflow-x: auto; 
+}
+
+.scheduleTitle {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.scheduleGrid {
+  display: grid;
+  grid-template-columns: 80px repeat(6, 1fr); 
+  grid-template-rows: auto 1fr; /* Cabecera y contenido */
+  min-width: 800px;
+  /* Damos una altura fija al área de contenido para que los porcentajes funcionen */
+  height: 1200px; 
+}
+
+.headerCorner {
+    grid-column: 1;
+    grid-row: 1;
+    border-bottom: 1px solid #E5E7EB;
+}
+
+.headerCell {
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  color: #4B5563;
+  font-size: 0.9rem;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 20;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.timeColumn {
+    grid-column: 1;
+    grid-row: 2;
+    position: relative; /* Contexto para las etiquetas de hora */
+    border-right: 1px solid #E5E7EB;
+}
+
+.timeCell {
+    position: absolute;
+    right: 5px;
+    transform: translateY(-50%); /* Centra la etiqueta en la línea */
+    font-size: 0.75rem;
+    color: #6B7280;
+    background: white;
+    padding: 0 4px;
+    z-index: 5;
+}
+
+.dayColumn {
+    position: relative; /* Contexto para las clases y las líneas */
+    grid-row: 2;
+    border-right: 1px solid #E5E7EB;
+}
+.dayColumn:last-child {
+    border-right: none;
+}
+
+.rowLine, .rowLineDashed {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #F3F4F6;
+    z-index: 1;
+}
+
+.rowLineDashed {
+    background-image: linear-gradient(to right, #E5E7EB 50%, transparent 50%);
+    background-size: 8px 1px;
+    background-color: transparent;
+    border-top: none;
+}
+
+.classCell {
+  position: absolute; 
+  left: 4px; 
+  right: 4px;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #1F2937;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8rem;
+  border: 1px solid rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  z-index: 10;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.classCell:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    z-index: 15;
+}
+.classCell strong {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #000;
+}
+.classCell span {
+    font-size: 0.75rem;
+}
+.classCell small {
+    margin-top: auto;
+    opacity: 0.8;
+    font-size: 0.7rem;
+}
+
+/* --- Estados (Cargando, Vacío) --- */
+.loader, .emptyState {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+}
+.emptyState h3 { margin: 0 0 0.5rem 0; }
+.emptyState p { margin: 0; color: #6B7280; }
+
+/* --- Estilos de Botones y Select (Reutilizados) --- */
+.select {
+  padding: 10px 12px;
+  border: 1px solid #D1D5DB;
+  border-radius: 6px;
+  font-size: 1rem;
+  min-width: 250px;
+}
+.select:focus {
+  outline: none;
+  border-color: #6366F1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btnVolver {
+    background: none;
+    color: #4B5563;
+    padding: 10px 0;
+    margin-bottom: 1rem;
+}
+.btnVolver:hover {
+    color: #111827;
+}
+.btnPrimary {
+  background-color: #6366F1;
+  color: white;
+}
+.btnPrimary:disabled {
+    background-color: #A5B4FC;
+    cursor: not-allowed;
+}
+.btnPrimary:not(:disabled):hover {
+  background-color: #4F46E5;
+}
+.btnSecondary {
+  background: #F3F4F6;
+  color: #374151;
+  border: 1px solid #E5E7EB;
+}
+.btnSecondary:hover {
+  background: #E5E7EB;
+}
