@@ -1,31 +1,24 @@
+import os
+import re
+import random
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from itertools import product
-import requests
-import json
-import re
-import random
-# NUEVA IMPORTACIÓN: Necesaria para trabajar con el cliente de Supabase
 from supabase import create_client, Client
 
 # --- Configuración de la Aplicación ---
 app = Flask(__name__)
 CORS(app)
 
-# --- Configuración de Supabase ---
-SUPABASE_URL = "https://lcnmlrghlhdqnskxtkjr.supabase.co"
-SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxjbm1scmdobGhkcW5za3h0a2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NTU5NTAsImV4cCI6MjA3MDMzMTk1MH0.AF2aTgrFtlG-CJOtbA7jhycBdbg2k55VJaOEV5de2Rk"
-
-# =================================================================
-# NUEVO: Configuración de la Clave de Servicio (service_role)
-# Esta clave es secreta y permite al servidor verificar usuarios.
-# Ve a tu panel de Supabase -> Project Settings -> API -> Service Role Key
-# =================================================================
-SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxjbm1scmdobGhkcW5za3h0a2pyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDc1NTk1MCwiZXhwIjoyMDcwMzMxOTUwfQ.W2W8dUFIorMWQEWjJLiuwnmgEjMRjm0jwBpCYHZyUJs"
-# =================================================================
+# --- Configuración de Supabase (Forma Segura) ---
+# Lee las variables desde el entorno de Railway (o tu .env local)
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
 
 # Creamos un cliente de Supabase para el servidor con la clave de servicio
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+
 
 # --- Clases de Modelo de Datos (Sin Cambios) ---
 class Sesion:
@@ -49,7 +42,7 @@ class Curso:
     def agregar_opcion_completa(self, paquete_de_sesiones):
         self.opciones.append(paquete_de_sesiones)
 
-# --- Funciones de Lógica de Horarios (CORREGIDAS) ---
+# --- Funciones de Lógica de Horarios (Sin Cambios) ---
 def to_minutes(time_str):
     try:
         parts = list(map(int, time_str.split(':')))
@@ -89,7 +82,7 @@ def solo_manana(horario): return all(to_minutes(s.hora_fin) <= 840 for s in hora
 def solo_tarde(horario): return all(to_minutes(s.hora_inicio) >= 780 for s in horario)
 def dia_libre(horario, dia_a_liberar): return all(s.dia.upper() != dia_a_liberar.upper() for s in horario)
 
-# --- Endpoint Principal de la API (MODIFICADO) ---
+# --- Endpoint Principal de la API (Sin Cambios en la lógica) ---
 @app.route("/horarios", methods=['GET'])
 def obtener_horarios_endpoint():
     print("\n" + "="*50)
