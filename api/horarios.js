@@ -1,38 +1,38 @@
-// api/horarios.js
-export const config = { runtime: "edge" };
-
-// Pon tu URL de Railway aquí o usa la env var BACKEND_URL en Vercel
-const UPSTREAM =
-  process.env.BACKEND_URL ||
-  "https://horarios-universitarios-prod.up.railway.app";
-
-export default async function handler(req) {
+// api/horarios.js  (Node Serverless Function en Vercel)
+export default async function handler(req, res) {
   try {
-    const url = new URL(req.url);
-    // Conservamos el querystring (?filtro=...)
-    const upstreamUrl = `${UPSTREAM}/horarios${url.search || ""}`;
+    const filtro = (req.query?.filtro ?? "todos").toString();
 
-    // Pasamos el Authorization del cliente al backend
-    const auth = req.headers.get("authorization") || "";
+    // NO hardcodees la URL: léela de la env var VITE_API_BASE_URL
+    const upstream =
+      process.env.VITE_API_BASE_URL; 
 
-    const res = await fetch(upstreamUrl, {
-      method: "GET",
-      headers: { Authorization: auth },
-    });
+    if (!upstream) {
+      return res
+        .status(500)
+        .json({ error: "Falta VITE_API_BASE_URL en variables de entorno" });
+    }
 
-    // Devolvemos el body tal cual y status/headers básicos
-    return new Response(res.body, {
-      status: res.status,
-      headers: {
-        "content-type":
-          res.headers.get("content-type") || "application/json",
-      },
-    });
-  } catch (err) {
-    // Error controlado para que el frontend reciba algo legible
-    return new Response(
-      JSON.stringify({ error: "Proxy error", detail: String(err) }),
-      { status: 502, headers: { "content-type": "application/json" } }
+    // Pasamos Authorization del cliente al backend
+    const auth = req.headers["authorization"] || "";
+
+    const r = await fetch(
+      `${upstream}/horarios?filtro=${encodeURIComponent(filtro)}`,
+      {
+        method: "GET",
+        headers: { Authorization: auth },
+      }
     );
+
+    res.status(r.status);
+    const ct = r.headers.get("content-type");
+    if (ct) res.setHeader("content-type", ct);
+
+    const buf = Buffer.from(await r.arrayBuffer());
+    res.send(buf);
+  } catch (e) {
+    res
+      .status(502)
+      .json({ error: "Proxy error", detail: String(e?.message || e) });
   }
 }
