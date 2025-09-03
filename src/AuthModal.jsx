@@ -48,7 +48,7 @@ export default function AuthModal({ isOpen }) {
       <div className={styles.modalCard}>
         <h1 className={styles.header}>{isSignUp ? 'Crea tu Cuenta' : 'Inicia Sesión'}</h1>
         <p className={styles.description}>
-          Para guardar tus cursos y generar horarios, necesitas una cuenta.
+          Para guardar tus cursos y generar horarios necesitas una cuenta.
         </p>
         <form onSubmit={isSignUp ? handleSignUp : handleLogin}>
           <div className={styles.inputGroup}>
