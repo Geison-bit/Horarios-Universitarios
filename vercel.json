@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/horarios",
+      "destination": "https://horarios-universitarios-production.up.railway.app/horarios"
+    }
+  ]
+}
