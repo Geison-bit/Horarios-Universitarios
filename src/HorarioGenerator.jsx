@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import styles from './HorarioGenerator.module.css';
-import { supabase } from "./supabaseClient"; // Asegúrate de que tu cliente de Supabase se exporta desde este archivo
-import PaymentModal from "./PaymentModal";   // Importamos el nuevo modal de pago
+import { supabase } from "./supabaseClient";
+import PaymentModal from "./PaymentModal";
 
 // Las librerías para PDF siguen siendo necesarias en tu index.html
 // <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -20,50 +20,47 @@ export default function HorarioGenerator({ onVolver }) {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   // =================================================================
-  // FUNCIÓN MODIFICADA PARA ENVIAR EL TOKEN DE USUARIO
+  // FUNCIÓN: OBTENER SESIÓN + PEDIR HORARIOS AL PROXY /api/horarios
   // =================================================================
   const fetchUserDataAndSchedules = async (currentFiltro) => {
     setLoading(true);
     setHorarios([]);
-    
+
     try {
-      // 1. Obtenemos la sesión actual del usuario para conseguir su token
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      // 1) Sesión y token
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       if (!session) throw new Error("No hay sesión de usuario activa. Por favor, inicia sesión de nuevo.");
 
-      // Obtenemos el perfil del usuario para los intentos
+      // 2) Intentos restantes desde 'profiles'
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('attempts_remaining')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("attempts_remaining")
+          .eq("id", user.id)
           .single();
-        
-        if (profileError && profileError.code !== 'PGRST116') {
-          console.error('Error fetching profile:', profileError);
+
+        if (profileError && profileError.code !== "PGRST116") {
+          console.error("Error fetching profile:", profileError);
         }
         setAttemptsRemaining(profileData ? profileData.attempts_remaining : 3);
       }
 
-      // ===================================================================
-      // LÍNEAS CORREGIDAS PARA USAR LA VARIABLE DE ENTORNO
-      // ===================================================================
-      // 2. Leemos la URL del API desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_BASE_URL;
-      
-      // 3. Hacemos la petición al servidor usando esa variable, enviando el token en los encabezados
-      const res = await fetch(`${apiUrl}/horarios?filtro=${currentFiltro}`, {
+      // 3) Llamada al backend a través del PROXY del mismo dominio
+      const res = await fetch(`/api/horarios?filtro=${encodeURIComponent(currentFiltro)}`, {
         headers: {
-          'Authorization': `Bearer ${session.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
-      // ===================================================================
 
       if (!res.ok) throw new Error(`Error del servidor: ${res.statusText}`);
       const data = await res.json();
-      if (data && data.length > 0) {
+
+      if (Array.isArray(data) && data.length > 0) {
         setAllSchedules(data);
         setHorarios(data[0]);
         setCurrentIndex(0);
@@ -98,14 +95,14 @@ export default function HorarioGenerator({ onVolver }) {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { error } = await supabase
-          .from('profiles')
+          .from("profiles")
           .update({ attempts_remaining: newAttempts })
-          .eq('id', user.id);
-        
+          .eq("id", user.id);
+
         if (error) {
-            console.error("Error updating attempts:", error);
+          console.error("Error updating attempts:", error);
         } else {
-            setAttemptsRemaining(newAttempts);
+          setAttemptsRemaining(newAttempts);
         }
       }
     } else {
@@ -116,63 +113,63 @@ export default function HorarioGenerator({ onVolver }) {
   const handleDownloadPDF = () => {
     const scheduleToCapture = scheduleTableRef.current;
     if (!scheduleToCapture) {
-        alert("No se puede encontrar el horario para descargar.");
-        return;
+      alert("No se puede encontrar el horario para descargar.");
+      return;
     }
-    const options = { scale: 2, useCORS: true, backgroundColor: '#ffffff' };
-    window.html2canvas(scheduleToCapture, options).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgProps = pdf.getImageProperties(imgData);
-        const imgWidth = imgProps.width;
-        const imgHeight = imgProps.height;
-        const pdfRatio = pdfWidth / pdfHeight;
-        const imgRatio = imgWidth / imgHeight;
-        let finalWidth, finalHeight, x, y;
-        const margin = 40;
-        if (imgRatio > pdfRatio) {
-            finalWidth = pdfWidth - margin;
-            finalHeight = finalWidth / imgRatio;
-        } else {
-            finalHeight = pdfHeight - margin;
-            finalWidth = finalHeight * imgRatio;
-        }
-        x = (pdfWidth - finalWidth) / 2;
-        y = (pdfHeight - finalHeight) / 2;
-        pdf.addImage(imgData, 'PNG', x, y, finalWidth, finalHeight);
-        pdf.save("mi_horario_universitario.pdf");
+    const options = { scale: 2, useCORS: true, backgroundColor: "#ffffff" };
+    window.html2canvas(scheduleToCapture, options).then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new window.jspdf.jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = pdf.getImageProperties(imgData);
+      const imgWidth = imgProps.width;
+      const imgHeight = imgProps.height;
+      const pdfRatio = pdfWidth / pdfHeight;
+      const imgRatio = imgWidth / imgHeight;
+      let finalWidth, finalHeight, x, y;
+      const margin = 40;
+      if (imgRatio > pdfRatio) {
+        finalWidth = pdfWidth - margin;
+        finalHeight = finalWidth / imgRatio;
+      } else {
+        finalHeight = pdfHeight - margin;
+        finalWidth = finalHeight * imgRatio;
+      }
+      x = (pdfWidth - finalWidth) / 2;
+      y = (pdfHeight - finalHeight) / 2;
+      pdf.addImage(imgData, "PNG", x, y, finalWidth, finalHeight);
+      pdf.save("mi_horario_universitario.pdf");
     });
   };
 
   // --- LÓGICA DE RENDERIZADO ---
   const dias = ["LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"];
   const START_HOUR = 7;
-  const END_HOUR = 23; 
+  const END_HOUR = 23;
   const totalMinutesInRange = (END_HOUR - START_HOUR) * 60;
 
   const timeToMinutes = (time) => {
-    const [h, m] = time.split(':').map(Number);
+    const [h, m] = time.split(":").map(Number);
     return h * 60 + m;
   };
 
   const dynamicTimeSlots = useMemo(() => {
     if (!horarios || horarios.length === 0) return { timeLabels: [], hourLines: [] };
     const timePoints = new Set();
-    horarios.forEach(clase => {
-        timePoints.add(clase.hora_inicio);
-        timePoints.add(clase.hora_fin);
+    horarios.forEach((clase) => {
+      timePoints.add(clase.hora_inicio);
+      timePoints.add(clase.hora_fin);
     });
     const sortedTimePoints = Array.from(timePoints).sort((a, b) => a.localeCompare(b));
-    const timeLabels = sortedTimePoints.map(hora => ({
-        label: hora,
-        top: ((timeToMinutes(hora) - START_HOUR * 60) / totalMinutesInRange) * 100
+    const timeLabels = sortedTimePoints.map((hora) => ({
+      label: hora,
+      top: ((timeToMinutes(hora) - START_HOUR * 60) / totalMinutesInRange) * 100,
     }));
     const hourLines = [];
     for (let i = START_HOUR; i < END_HOUR; i++) {
-        hourLines.push({ top: (((i - START_HOUR) * 60) / totalMinutesInRange) * 100, isDashed: false });
-        hourLines.push({ top: (((i - START_HOUR) * 60 + 30) / totalMinutesInRange) * 100, isDashed: true });
+      hourLines.push({ top: (((i - START_HOUR) * 60) / totalMinutesInRange) * 100, isDashed: false });
+      hourLines.push({ top: (((i - START_HOUR) * 60 + 30) / totalMinutesInRange) * 100, isDashed: true });
     }
     return { timeLabels, hourLines };
   }, [horarios]);
@@ -182,12 +179,12 @@ export default function HorarioGenerator({ onVolver }) {
     const colorMap = new Map();
     let colorIndex = 0;
     const getBaseCourseName = (fullName) => fullName.split(' - ')[0];
-    const uniqueCourses = new Set((horarios || []).map(h => getBaseCourseName(h.nombreCurso)));
-    uniqueCourses.forEach(courseName => {
-        if (!colorMap.has(courseName)) {
-            colorMap.set(courseName, colors[colorIndex % colors.length]);
-            colorIndex++;
-        }
+    const uniqueCourses = new Set((horarios || []).map((h) => getBaseCourseName(h.nombreCurso)));
+    uniqueCourses.forEach((courseName) => {
+      if (!colorMap.has(courseName)) {
+        colorMap.set(courseName, colors[colorIndex % colors.length]);
+        colorIndex++;
+      }
     });
     return colorMap;
   }, [horarios]);
@@ -196,7 +193,7 @@ export default function HorarioGenerator({ onVolver }) {
     <>
       <div className={styles.pageContainer}>
         <button onClick={onVolver} className={`${styles.btn} ${styles.btnVolver}`}>⬅️ Volver a Planificar</button>
-        
+
         <div className={styles.controlPanel}>
           <div className={styles.filterGroup}>
             <label htmlFor="filtro">Preferencias de Horario</label>
@@ -213,15 +210,15 @@ export default function HorarioGenerator({ onVolver }) {
           </div>
           <div className={styles.attemptsCounter}>
             <span>Intentos Restantes:</span>
-            <strong>{attemptsRemaining ?? '...'}</strong>
+            <strong>{attemptsRemaining ?? "..."}</strong>
           </div>
           <div className={styles.actionGroup}>
-              <button onClick={handleNextCombination} className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading || allSchedules.length <= 1}>
-                  🔄 Otra Combinación
-              </button>
-              <button onClick={handleDownloadPDF} className={`${styles.btn} ${styles.btnSecondary}`} disabled={loading || !Array.isArray(horarios) || horarios.length === 0}>
-                  📄 Descargar PDF
-              </button>
+            <button onClick={handleNextCombination} className={`${styles.btn} ${styles.btnPrimary}`} disabled={loading || allSchedules.length <= 1}>
+              🔄 Otra Combinación
+            </button>
+            <button onClick={handleDownloadPDF} className={`${styles.btn} ${styles.btnSecondary}`} disabled={loading || !Array.isArray(horarios) || horarios.length === 0}>
+              📄 Descargar PDF
+            </button>
           </div>
         </div>
 
@@ -231,64 +228,62 @@ export default function HorarioGenerator({ onVolver }) {
           <div className={styles.scheduleContainer} ref={scheduleTableRef}>
             <h3 className={styles.scheduleTitle}>Horario Sugerido ({currentIndex + 1} / {allSchedules.length})</h3>
             <div className={styles.scheduleGrid}>
-                  <div className={styles.headerCorner}></div>
-                  {dias.map(dia => <div key={dia} className={styles.headerCell}>{dia}</div>)}
-                  <div className={styles.timeColumn}>
-                      {dynamicTimeSlots.timeLabels.map(({ label, top }) => (
-                          <div key={label} className={styles.timeCell} style={{ top: `${top}%` }}>
-                              <span>{label}</span>
-                          </div>
-                      ))}
+              <div className={styles.headerCorner}></div>
+              {dias.map((dia) => (
+                <div key={dia} className={styles.headerCell}>{dia}</div>
+              ))}
+              <div className={styles.timeColumn}>
+                {dynamicTimeSlots.timeLabels.map(({ label, top }) => (
+                  <div key={label} className={styles.timeCell} style={{ top: `${top}%` }}>
+                    <span>{label}</span>
                   </div>
-                  {dias.map(dia => (
-                      <div key={dia} className={styles.dayColumn}>
-                          {dynamicTimeSlots.hourLines.map(({ top, isDashed }) => (
-                              <div key={top} className={isDashed ? styles.rowLineDashed : styles.rowLine} style={{ top: `${top}%` }}></div>
-                          ))}
-                          {horarios
-                              .filter(clase => clase.dia.toUpperCase().trim() === dia)
-                              .map((clase, index) => {
-                                  const startMinutes = timeToMinutes(clase.hora_inicio) - (START_HOUR * 60);
-                                  const endMinutes = timeToMinutes(clase.hora_fin) - (START_HOUR * 60);
-                                  const durationMinutes = endMinutes - startMinutes;
-                                  const topPercent = (startMinutes / totalMinutesInRange) * 100;
-                                  const heightPercent = (durationMinutes / totalMinutesInRange) * 100;
-                                  const baseCourseName = clase.nombreCurso.split(' - ')[0];
-                                  const positionStyle = {
-                                      top: `${topPercent}%`,
-                                      height: `${heightPercent}%`,
-                                      backgroundColor: courseColors.get(baseCourseName)
-                                  };
-                                  return (
-                                      <div 
-                                          key={`${clase.nrc}-${index}`}
-                                          className={styles.classCell} 
-                                          style={positionStyle}
-                                      >
-                                          <strong>{clase.nombreCurso}</strong>
-                                          <span>{`${clase.hora_inicio} - ${clase.hora_fin}`}</span>
-                                          <small>{clase.tipo_componente} - {clase.nombre_grupo}</small>
-                                          <small>NRC: {clase.nrc} | {clase.aula}</small>
-                                      </div>
-                                  );
-                              })}
-                      </div>
+                ))}
+              </div>
+              {dias.map((dia) => (
+                <div key={dia} className={styles.dayColumn}>
+                  {dynamicTimeSlots.hourLines.map(({ top, isDashed }) => (
+                    <div key={top} className={isDashed ? styles.rowLineDashed : styles.rowLine} style={{ top: `${top}%` }}></div>
                   ))}
+                  {horarios
+                    .filter((clase) => clase.dia.toUpperCase().trim() === dia)
+                    .map((clase, index) => {
+                      const startMinutes = timeToMinutes(clase.hora_inicio) - START_HOUR * 60;
+                      const endMinutes = timeToMinutes(clase.hora_fin) - START_HOUR * 60;
+                      const durationMinutes = endMinutes - startMinutes;
+                      const topPercent = (startMinutes / totalMinutesInRange) * 100;
+                      const heightPercent = (durationMinutes / totalMinutesInRange) * 100;
+                      const baseCourseName = clase.nombreCurso.split(" - ")[0];
+                      const positionStyle = {
+                        top: `${topPercent}%`,
+                        height: `${heightPercent}%`,
+                        backgroundColor: courseColors.get(baseCourseName),
+                      };
+                      return (
+                        <div key={`${clase.nrc}-${index}`} className={styles.classCell} style={positionStyle}>
+                          <strong>{clase.nombreCurso}</strong>
+                          <span>{`${clase.hora_inicio} - ${clase.hora_fin}`}</span>
+                          <small>{clase.tipo_componente} - {clase.nombre_grupo}</small>
+                          <small>NRC: {clase.nrc} | {clase.aula}</small>
+                        </div>
+                      );
+                    })}
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {!loading && (!Array.isArray(horarios) || horarios.length === 0) && (
           <div className={styles.emptyState}>
-              <h3>🚫 Sin resultados</h3>
-              <p>No se encontró ninguna combinación de horario con los filtros actuales. Prueba con otra preferencia.</p>
+            <h3>🚫 Sin resultados</h3>
+            <p>No se encontró ninguna combinación de horario con los filtros actuales. Prueba con otra preferencia.</p>
           </div>
         )}
       </div>
-      
-      <PaymentModal 
-        isOpen={isPaymentModalOpen} 
-        onClose={() => setIsPaymentModalOpen(false)} 
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
       />
     </>
   );
