@@ -47,12 +47,19 @@ export default function HorarioGenerator({ onVolver }) {
         setAttemptsRemaining(profileData ? profileData.attempts_remaining : 3);
       }
 
-      // 2. Hacemos la petición al servidor, enviando el token en los encabezados
-      const res = await fetch(`http://localhost:5000/horarios?filtro=${currentFiltro}`, {
+      // ===================================================================
+      // LÍNEAS CORREGIDAS PARA USAR LA VARIABLE DE ENTORNO
+      // ===================================================================
+      // 2. Leemos la URL del API desde las variables de entorno
+      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+      
+      // 3. Hacemos la petición al servidor usando esa variable, enviando el token en los encabezados
+      const res = await fetch(`${apiUrl}/horarios?filtro=${currentFiltro}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
       });
+      // ===================================================================
 
       if (!res.ok) throw new Error(`Error del servidor: ${res.statusText}`);
       const data = await res.json();
