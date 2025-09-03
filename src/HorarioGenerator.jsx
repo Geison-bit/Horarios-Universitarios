@@ -51,7 +51,7 @@ export default function HorarioGenerator({ onVolver }) {
       // LÍNEAS CORREGIDAS PARA USAR LA VARIABLE DE ENTORNO
       // ===================================================================
       // 2. Leemos la URL del API desde las variables de entorno
-      const apiUrl = import.meta.env.VITE_API_BASE_URL;
+      const apiUrl = import.meta.env.VITE_SUPABASE_URL;
       
       // 3. Hacemos la petición al servidor usando esa variable, enviando el token en los encabezados
       const res = await fetch(`${apiUrl}/horarios?filtro=${currentFiltro}`, {
