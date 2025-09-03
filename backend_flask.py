@@ -17,7 +17,7 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_KEY")
 
 # Creamos un cliente de Supabase para el servidor con la clave de servicio
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 # --- Clases de Modelo de Datos (Sin Cambios) ---
