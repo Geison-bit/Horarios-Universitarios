@@ -14,10 +14,8 @@ CORS(app)
 # --- Configuración de Supabase (Forma Segura) ---
 # Lee las variables desde el entorno de Railway (o tu .env local)
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_KEY")
-
-# Creamos un cliente de Supabase para el servidor con la clave de servicio
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY") # El nombre de la variable coincide
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) # Y aquí también
 
 
 # --- Clases de Modelo de Datos (Sin Cambios) ---
